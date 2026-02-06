@@ -1,0 +1,7 @@
+[project]
+name = "simplex-solver"
+version = "0.1.0"
+description = "A Simplex Solver implemented in Python and tested against Gurobi (only correctness)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
