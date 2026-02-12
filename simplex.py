@@ -26,7 +26,7 @@ class Simplex():
                     ma = val
                     argma = xi
             
-            if all(row[argma] < 0 for row in self.mat[1:]): # Unbounded check
+            if all(row[argma] <= 0 for row in self.mat[1:]): # Unbounded check
                 print("Unbounded LP - no solution")
                 break
 
