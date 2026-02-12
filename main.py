@@ -1,3 +1,4 @@
+import sys
 from simplex import Simplex
 
 
@@ -18,5 +19,13 @@ def main(filename: str) -> None:
     print(solver.solution())
 
 
+def run_tests() -> None:
+    import pytest
+    sys.exit(pytest.main(["-v", "tests/"]))
+
+
 if __name__ == "__main__":
-    main("problem.txt")
+    if len(sys.argv) > 1 and sys.argv[1] == "test":
+        run_tests()
+    else:
+        main("problem.txt")
