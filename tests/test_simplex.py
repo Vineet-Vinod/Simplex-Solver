@@ -169,7 +169,7 @@ def test_three_constraints():
     s.t.  6x1 + 4x2 + 2x3 <= 240
           3x1 + 2x2 + 5x3 <= 270
           5x1 + 6x2 + 5x3 <= 420
-    Known optimal: obj = 220
+    Known optimal: x1=3.75, x2=35.625, x3=37.5 => obj=273.75
     """
     tableau = _make([
         [5, 4, 3, 0, 0, 0, 0],
@@ -179,28 +179,30 @@ def test_three_constraints():
     ])
     s = Simplex(tableau)
     s.solve()
-    assert pytest.approx(-s.mat[0][-1], abs=1e-6) == 220.0
+    assert pytest.approx(-s.mat[0][-1], abs=1e-6) == 273.75
 
 
-# ── 9. Degenerate LP — zero RHS can cause cycling or wrong pivot ─────────────
+# ── 9. Degenerate LP — zero RHS with negative pivot column entry ─────────────
 
-def test_degenerate_zero_rhs():
+def test_degenerate_negative_pivot_with_zero_rhs():
     """
-    BUG: When RHS is 0 and pivot column entry is positive, the ratio is 0.
-    But if another row has a negative pivot column entry, 0/negative = 0
-    which ties and the solver may pick the wrong row.
+    BUG: Row 2 has a negative entry in the pivot column. The ratio
+    0/(-1) = 0 ties with (or beats) 1/1 = 1, so the solver incorrectly
+    picks row 2 as the pivot row.
 
-    Maximize x1  s.t.  x1 <= 0, x1 + x2 <= 1
-    Optimal: x1=0, x2=0 => obj=0
+    Maximize x1  s.t.  -x1 + x2 <= 0, x1 + x3 <= 1
+    Optimal: x1=1 => obj=1
+    When entering x1, row 1 has coeff -1 → ratio 0/(-1) = 0 (should be skipped),
+    row 2 has coeff 1 → ratio 1/1 = 1 (correct pivot). The solver picks row 1.
     """
     tableau = _make([
-        [1, 0, 0, 0, 0],
-        [1, 0, 1, 0, 0],
-        [1, 1, 0, 1, 1],
+        [1,  0, 0, 0, 0],
+        [-1, 1, 1, 0, 0],
+        [1,  0, 0, 1, 1],
     ])
     s = Simplex(tableau)
     s.solve()
-    assert pytest.approx(-s.mat[0][-1], abs=1e-6) == 0.0
+    assert pytest.approx(-s.mat[0][-1], abs=1e-6) == 1.0
 
 
 # ── 10. Large coefficients — numeric stability stress test ───────────────────
