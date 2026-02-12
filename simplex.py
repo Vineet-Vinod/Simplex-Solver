@@ -1,4 +1,5 @@
 from typing import List
+from math import inf
 import sys
 
 class Simplex():
@@ -30,9 +31,11 @@ class Simplex():
                 print("Unbounded LP - no solution")
                 break
 
-            mi, argmi = self.mat[1][-1] / self.mat[1][argma], 1
-            for yi in range(2, self.eqns):
-                if mi > self.mat[yi][-1] / self.mat[yi][argma]:
+            mi, argmi = inf, 0 # self.mat[1][-1] / self.mat[1][argma], 1
+            for yi in range(1, self.eqns):
+                if self.mat[yi][argma] and \
+                   self.mat[yi][-1] / self.mat[yi][argma] > 0 \
+                   and mi > self.mat[yi][-1] / self.mat[yi][argma]:
                     mi = self.mat[yi][-1] / self.mat[yi][argma]
                     argmi = yi
             
